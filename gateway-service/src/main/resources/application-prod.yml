@@ -1,0 +1,8 @@
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI}
