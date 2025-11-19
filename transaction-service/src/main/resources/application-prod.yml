@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${TRANSACTION_DB_HOST}:${TRANSACTION_DB_PORT}/${TRANSACTION_DB_NAME}
+    username: ${TRANSACTION_DB_USERNAME}
+    password: ${TRANSACTION_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI}

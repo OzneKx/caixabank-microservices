@@ -1,0 +1,196 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - caixabank-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    restart: on-failure
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - caixabank-network
+
+  auth-db:
+    image: postgres:17
+    platform: linux/arm64
+    container_name: auth-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - caixabank-network
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    env_file:
+      - ./auth-service/.env.auth
+    ports:
+      - "8081:8081"
+    networks:
+      - caixabank-network
+
+  account-db:
+    image: postgres:17
+    platform: linux/arm64
+    container_name: account-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: account_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - account_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - caixabank-network
+
+  account-service:
+    build:
+      context: ./account-service
+      dockerfile: Dockerfile
+    container_name: account-service
+    depends_on:
+      account-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    env_file:
+      - ./account-service/.env.account
+    ports:
+      - "8082:8082"
+    networks:
+      - caixabank-network
+
+  transaction-db:
+    image: postgres:17
+    platform: linux/arm64
+    container_name: transaction-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transaction_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - transaction_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - caixabank-network
+
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    container_name: transaction-service
+    depends_on:
+      transaction-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      account-service:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+    env_file:
+      - ./transaction-service/.env.transaction
+    ports:
+      - "8083:8083"
+    networks:
+      - caixabank-network
+
+  antifraud-service:
+    build:
+      context: ./antifraud-service
+      dockerfile: Dockerfile
+    container_name: antifraud-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    env_file:
+      - ./antifraud-service/.env.antifraud
+    ports:
+      - "8084:8084"
+    networks:
+      - caixabank-network
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    depends_on:
+      auth-service:
+        condition: service_started
+      account-service:
+        condition: service_started
+      transaction-service:
+        condition: service_started
+      antifraud-service:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+    env_file:
+      - ./gateway-service/.env.gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - caixabank-network
+
+networks:
+  caixabank-network:
+
+volumes:
+  auth_data:
+  account_data:
+  transaction_data:
