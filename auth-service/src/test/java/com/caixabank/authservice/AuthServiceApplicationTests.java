@@ -1,4 +1,4 @@
-package com.caixabank.auth_service;
+package com.caixabank.authservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
