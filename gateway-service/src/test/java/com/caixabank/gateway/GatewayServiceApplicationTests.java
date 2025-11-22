@@ -1,4 +1,4 @@
-package com.caixabank.gateway_service;
+package com.caixabank.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
