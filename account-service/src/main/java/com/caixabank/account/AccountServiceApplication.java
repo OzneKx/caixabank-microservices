@@ -1,4 +1,4 @@
-package com.caixabank.account_service;
+package com.caixabank.account;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

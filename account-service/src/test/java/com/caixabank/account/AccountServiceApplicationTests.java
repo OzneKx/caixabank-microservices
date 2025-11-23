@@ -1,4 +1,4 @@
-package com.caixabank.account_service;
+package com.caixabank.account;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
