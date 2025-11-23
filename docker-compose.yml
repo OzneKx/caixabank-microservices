@@ -2,9 +2,6 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
@@ -38,8 +35,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: auth_db
-    ports:
-      - "5437:5432"
     volumes:
       - auth_data:/var/lib/postgresql/data
     healthcheck:
@@ -62,8 +57,6 @@ services:
         condition: service_healthy
     env_file:
       - ./auth-service/.env.auth
-    ports:
-      - "8081:8081"
     networks:
       - caixabank-network
 
@@ -76,8 +69,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: account_db
-    ports:
-      - "5436:5432"
     volumes:
       - account_data:/var/lib/postgresql/data
     healthcheck:
@@ -100,8 +91,6 @@ services:
         condition: service_healthy
     env_file:
       - ./account-service/.env.account
-    ports:
-      - "8082:8082"
     networks:
       - caixabank-network
 
@@ -114,8 +103,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: transaction_db
-    ports:
-      - "5438:5432"
     volumes:
       - transaction_data:/var/lib/postgresql/data
     healthcheck:
@@ -142,8 +129,6 @@ services:
         condition: service_healthy
     env_file:
       - ./transaction-service/.env.transaction
-    ports:
-      - "8083:8083"
     networks:
       - caixabank-network
 
@@ -159,8 +144,6 @@ services:
         condition: service_healthy
     env_file:
       - ./antifraud-service/.env.antifraud
-    ports:
-      - "8084:8084"
     networks:
       - caixabank-network
 
