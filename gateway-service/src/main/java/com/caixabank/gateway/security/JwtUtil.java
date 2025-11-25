@@ -19,27 +19,27 @@ public class JwtUtil {
     private long jwtExpiration;
 
     public String extractUsername(String token) {
-        return getClaims(token).getSubject();
+        return getAllClaims(token).getSubject();
     }
 
     public Long extractUserId(String token) {
-        return getClaims(token).get("userId", Long.class);
+        return getAllClaims(token).get("userId", Long.class);
     }
 
     public String extractRole(String token) {
-        return getClaims(token).get("role", String.class);
+        return getAllClaims(token).get("role", String.class);
     }
 
     public boolean isTokenValid(String token) {
         try {
-            Claims claims = getClaims(token);
+            Claims claims = getAllClaims(token);
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
             return false;
         }
     }
 
-    private Claims getClaims(String token) {
+    public Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
