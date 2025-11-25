@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,25 +26,25 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AccountResponse>> getAllAccounts(@RequestAttribute("userId") Long userId) {
+    public ResponseEntity<List<AccountResponse>> getAllAccounts(@RequestHeader("X-User-Id") Long userId) {
         List<AccountResponse> accountResponse = accountService.findAllAccountsByUserId(userId);
         return ResponseEntity.ok().body(accountResponse);
     }
 
     @GetMapping("/main")
-    public ResponseEntity<AccountResponse> getMainAccount(@RequestAttribute("userId") Long userId) {
+    public ResponseEntity<AccountResponse> getMainAccount(@RequestHeader("X-User-Id") Long userId) {
         AccountResponse accountResponse = accountService.findMainAccount(userId);
         return ResponseEntity.ok().body(accountResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponse> getById(@RequestAttribute("userId") Long userId, @PathVariable Long id) {
+    public ResponseEntity<AccountResponse> getById(@RequestHeader("X-User-Id") Long userId, @PathVariable Long id) {
         AccountResponse accountResponse = accountService.findById(id, userId);
         return ResponseEntity.ok().body(accountResponse);
     }
 
     @PostMapping
-    public ResponseEntity<AccountResponse> createAccount(@RequestAttribute("userId") Long userId,
+    public ResponseEntity<AccountResponse> createAccount(@RequestHeader("X-User-Id") Long userId,
                                                          @Valid @RequestBody AccountCreateRequest accountCreateRequest) {
         AccountResponse accountResponse = accountService.createAccount(userId, accountCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountResponse);
